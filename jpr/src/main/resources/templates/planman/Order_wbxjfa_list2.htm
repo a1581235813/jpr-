@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<head th:replace="~{debris/address::address('采购计划编制')}"></head>
+</head>
+<style>
+   #div1{
+    position: relative;
+     left: 230px;
+    
+   }
+  
+</style>
+<script type="text/javascript">
+$(function (){
+$("#datagrid").datagrid({
+	url:"/Orderlist2",
+	method:"get",
+	striped:true,
+	pagination:true,
+	rownumbers:true,
+	pageNumber:1,
+	pageList:[5,10,15,20],
+	pageSize:5,
+	fitColumns:true,
+	columns:[
+		[    
+        {field:'count',title:'选择',width:200,align:'left',checkbox:true},
+        {field:'material_code',title:'物资代码',width:200,align:'left'},
+        {field:'material_name',title:'物资名称',width:300,align:'left'},    
+        {field:'amount',title:'数量',width:200,align:'left'},   
+        {field:'unit_price',title:'预算价格',width:200,align:'left'},
+        {field:'end_date',title:'需求时间',width:200,align:'left',
+        	formatter: function(value,row,index){
+				
+				return value.substr(0,10);
+			}
+
+        }
+    ]
+		],
+    });
+    $("#btn1").click(function (){
+    	var name1=$("#name1").val();
+    	var name2=$("#name2").val();
+    	var px=$("#cc").combo("getValue");
+    	
+    	$("#datagrid").datagrid({
+    		queryParams:{
+    			materialCode:name1,
+    			materialName:name2,
+    			px:px
+    		}
+    		
+    	})
+    });
+    $("#btn2").click(function (){
+    	
+    	var rows=$("#datagrid").datagrid("getSelections");
+    	if(rows.length==0){
+    		alert('至少选中一条数据');
+    	}else{
+    		var list=[];
+    		for(var i=0;i<rows.length;i++){
+    			list.push(rows[i].id);
+    		}
+    		
+    		
+    		window.parent.main.location="/bianzhicaigoujihualist?ids="+list;
+    	}
+    	
+    });
+})
+</script>
+<body>
+   <h3 style="color:blue;text-align:center">未编采购计划的需求一览表</h3>
+<div id="div1"> <font size="2">物资编码:</font><input id="name1" class="easyui-textbox" data-options="iconCls:'icon-search'" style="width:180px;height:25px"> 
+ <font size="2">物资名称:</font><input  id="name2" class="easyui-textbox" data-options="iconCls:'icon-search'" style="width:180px;height:25px"> 
+<font size="2">排序:</font>  
+<select id="cc" class="easyui-combobox" name="dept" data-options="panelHeight:100" style="width:200px;height:25PX">   
+    <option value="material_code">按物资代码</option>   
+    <option value="end_date">按需求时间</option>   
+    <option value="amount">按需求数量</option>
+</select>
+<a  id="btn1" class="easyui-linkbutton" data-options="iconCls:'icon-search',withd:30,height:25" style="withd:20px,height:500PX" >搜索</a>  
+ </div> 
+ <table id="datagrid" >  </table>
+ <a id="btn2" class="easyui-linkbutton" data-options="iconCls:'icon-search'">编制采购计划</a>  
+</body>
+</html>

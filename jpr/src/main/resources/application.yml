@@ -1,0 +1,66 @@
+logging:
+  level:
+    com.turing.mapper: debug
+mybatis:
+  #类型别名扫描的包
+  type-aliases-package: com.turing.entity
+  configuration:
+    #懒加载相关
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
+    #最好加上该设置，否则mybatis默认情况下equals,clone,hashCode,toString都会触发懒加载
+    #该属性是个Set集合，需要使用“-”来逐一添加一项或多项配置（数组、List类似）
+    lazy-load-trigger-methods:
+    - ""
+    #映射骆驼命名法
+    map-underscore-to-camel-case: true  
+spring:  
+
+ 
+  thymeleaf:
+   cache: false #关闭缓存配置
+  datasource:
+    druid:
+      
+      #JDBC四要素
+      url: jdbc:mysql://localhost:3306/mrp?serverTimezone=UTC
+      #用户名
+      username: root
+      #加密后的密码
+      password: flpqYYBlscoK0d9m5UR5i14YDVitQ0A7Dof/XJ/rTHlQY5BG6Uy6+w46S4gjZZCQBrBwwpO5LNtv0SagABW8Bg==
+      driver-class-name: com.mysql.jdbc.Driver
+      ######密码加密相关######
+      #配置ConfigFilter（Druid内置过滤器之一）的过滤器，用于解压密码
+      filters: config
+      #设置密码需要加密，并配置publickey
+      connection-properties: config.decrypt=true;config.decrypt.key=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJNAvDcfsK9jADaX0mabOIgP5Wr74/49I/tMUzIYJ1E74l6D/ze1x1Z9lDG9vYO60wXecMXr5DFZ9+Xk39Vgo9cCAwEAAQ==
+
+      
+      #数据库连接池属性配置
+      #初始化连接数
+      initial-size: 1
+      #最大连接数量
+      max-active: 20
+      #获取连接时最大等待时间
+      max-wait: 10000
+      #最小连接数量
+      min-idle: 1
+      #配置间隔多久才进行一次检测，检测需要关闭的空闲连接
+      time-between-eviction-runs-millis: 60000
+      #用来检测连接是否有效的SQL，解决数据库断开连接的问题
+      validation-query: select 1
+      
+      
+      #StatViewServlet配置
+      stat-view-servlet:
+          enabled: true
+          login-username: admin
+          login-password: admin
+          url-pattern: /druid/*
+          
+       #WebStatFilter配置
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        #排除一些不必要的url
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"

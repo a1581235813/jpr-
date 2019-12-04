@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{debris/address::address('未通过审批采购计划一览表')}">
+<meta charset="UTF-8">
+<title>未通过审批采购计划一览表</title>
+</head>
+<script type="text/javascript">
+$(function (){
+	$("#datagrid").datagrid({
+		url:"/selectstock4",
+		method:"get",
+		striped:true,
+		pagination:true,
+		rownumbers:true,
+		singleSelect:true,
+		pageNumber:1,
+		pageList:[5,10,15,20],
+		pageSize:5,
+		fitColumns:true,
+		queryParams:{
+			  
+		},
+		columns:[
+			[    
+	        {field:'count',title:'选择',width:200,align:'left',checkbox:true},
+	        {field:'stock_name',title:'采购计划名称',width:200,align:'left'},
+	        {field:'stock_type',title:'采购类型',width:300,align:'left',
+	        	 formatter:function (value,row,index){
+	        		 if(value=="C000-1"){
+	        			 return "公开求购";
+	        		 }else{
+	        			 return "定向询价";
+	        		 }
+	 	 	        
+	 	 	        	
+	 	 	        } 	
+	        },    
+	        {field:'status',title:'采购进度',width:200,align:'left',
+	        	 formatter:function (value,row,index){
+	 	        	 if(value=="C001-30"){
+	 	        		return "未确定"
+	 	        	 }else if(value=="C001-40"){
+	 	        		return "待审"
+	 	        	 }else if(value=="C001-50"){
+	 	        		 return "待下达"
+	 	        	 }else if(value=="C001-51"){
+	 	        		return "驳回"
+	 	        	 }else if(value=='C001-60'){
+	 	        		return "下达"
+	 	        	 }
+	 	        	
+	 	        } 		
+	        }, 
+	        {field:'submit_date',title:'采购计划下达时间',
+	        	 formatter:function (value,row,index){
+	 	        return 	value.substr(0,10);
+	 	        	
+	 	        } 
+	        }
+	        
+	    ]
+			]
+		
+
+
+	});
+	$("#btn1").click(function (){
+	  var name1=  $("#name1").val();
+	  var cc=$("#cc").combo("getValue");
+		$("#datagrid").datagrid({
+			queryParams:{
+				name1:name1,
+				state:cc
+				
+			}
+		});
+	});
+	 $("#btn").click(function (){
+		var rows= $("#datagrid").datagrid("getSelected");
+		if(rows==null){
+			alert('请选择一项');
+		}else{
+			location.href="idstock?id="+rows.id;
+		}
+		
+	}); 
+	 $("#btn3").click(function (){
+		 
+			var rows= $("#datagrid").datagrid("getSelected");
+			if(rows==null){
+				alert('请选择一项');
+			}else{
+				
+			  location.href="/idorders?id="+rows.stock_id;
+			}
+			
+		}); 
+	 $("#btn2").click(function () {
+		 var rows= $("#datagrid").datagrid("getSelected");
+		
+		 console.log(rows);
+		 if(rows==null){
+			 alert('请选择一项');
+		 }else{
+			 
+			 location.href="/xjfatz_xjfamx3?id="+rows.stock_id+"&id2="+rows.order_id;
+		 }
+		 
+		 
+	 })
+		
+	
+		
+	
+})
+</script>
+<body>
+   
+   <h3 style="color:blue;text-align:center">采购计划一览表</h3>
+ 
+ 
+<table id="datagrid" >  </table>
+<a  id="btn3" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'">详细</a> 
+<a  id="btn2" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">修改</a>  
+<a  id="btn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'">删除</a>  
+</body>
+
+</html>

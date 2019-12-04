@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<head th:replace="~{debris/address::address('采购计划一览表')}">
+</head>
+<style>
+   #div1{
+    position: relative;
+     left: 350px;
+    
+   }
+  
+</style>
+<script type="text/javascript">
+$(function (){
+	$("#datagrid").datagrid({
+		url:"/selectstock3",
+		method:"get",
+		striped:true,
+		pagination:true,
+		rownumbers:true,
+		singleSelect:true,
+		pageNumber:1,
+		pageList:[5,10,15,20],
+		pageSize:5,
+		fitColumns:true,
+		queryParams:{
+			  
+		},
+		columns:[
+			[    
+	        {field:'count',title:'选择',width:200,align:'left',checkbox:true},
+	        {field:'stock_name',title:'采购计划名称',width:200,align:'left'},
+	        {field:'stock_type',title:'采购类型',width:300,align:'left',
+	        	 formatter:function (value,row,index){
+	        		 if(value=="C000-1"){
+	        			 return "制造中心采购公开求购";
+	        		 }else{
+	        			 return "制造中心采购定向询价";
+	        		 }
+	 	 	        
+	 	 	        	
+	 	 	        } 	
+	        },    
+	        {field:'status',title:'采购进度',width:200,align:'left',
+	        	 formatter:function (value,row,index){
+	 	        	 if(value=="C001-30"){
+	 	        		return "未确定"
+	 	        	 }else if(value=="C001-40"){
+	 	        		return "待审"
+	 	        	 }else if(value=="C001-50"){
+	 	        		 return "待下达"
+	 	        	 }else if(value=="C001-51"){
+	 	        		return "驳回"
+	 	        	 }else if(value=='C001-60'){
+	 	        		return "下达"
+	 	        	 }
+	 	        	
+	 	        } 		
+	        }, 
+	        {field:'submit_date',title:'采购计划下达时间',
+	        	 formatter:function (value,row,index){
+	 	        return 	value.substr(0,10);
+	 	        	
+	 	        } 
+	        },
+	        {field:'enquire_name',title:'询价书',width:200,align:'left'}
+	    ]
+			]
+		
+
+
+	});
+	$("#btn1").click(function (){
+	  var name1=  $("#name1").val();
+	  var cc=$("#cc").combo("getValue");
+		$("#datagrid").datagrid({
+			queryParams:{
+				name1:name1,
+				state:cc
+				
+			}
+		});
+	});
+	 $("#btn").click(function (){
+		var rows= $("#datagrid").datagrid("getSelected");
+		if(rows==null){
+			alert('请选择一项');
+		}else{
+			location.href="idstock?id="+rows.id;
+		}
+		
+	}); 
+	 $("#btn3").click(function (){
+		 
+			var rows= $("#datagrid").datagrid("getSelected");
+			if(rows==null){
+				alert('请选择一项');
+			}else{
+				if(confirm("报批后，采购计划将进行审批流程！ 状态改为待审")){
+					$.ajax({
+						url:"/updatestock2",
+						type:"post",
+						data:{id:rows.id},
+						 success:function (data) {
+			                   if(data=="success"){
+			                        alert("下达成功√");
+			                        $('#datagrid').datagrid('reload');  
+			                    }
+			                }
+						
+					});  
+				 }
+			}
+			
+		}); 
+		
+	
+})
+</script>
+<body>
+   
+   <h3 style="color:blue;text-align:center">采购计划一览表</h3>
+ 
+ 
+<table id="datagrid" >  </table>
+<a  id="btn3" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'">下达</a> 
+<a  id="btn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'">打开</a>  
+</body>
+
+</html>

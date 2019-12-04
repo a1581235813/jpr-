@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{debris/address::address('报价维护')}"></head>
+<body>
+<h4 style="text-align: center;color:#0070c0;font-weight: bold">报价维护</h4>
+<!--按条件查询-->
+<div id="tb" style="padding: 3px;border-top: solid #99ccff 1px;text-align: center">
+    <form id="quote_form" method="post">
+        <spon>报价书名称:</spon> <input  id="queTitle" >
+        <spon>对应询价书名称:</spon> <input  id="enquireName">
+        <a href="#" class="btn btn-primary btn-sm"  onclick="doQuote()" >查询</a>
+        <a href="#" class="btn btn-primary btn-sm" onclick="$('#quote_form').form('clear')" dataoptions="iconCls:'icon-reload'">清空</a>
+    </form>
+</div>
+<!--产品数据表格-->
+<table id="dg"></table>
+<script type="text/javascript">
+    var url;
+    $(function () {
+        $('#dg').datagrid({
+            url:'/showQuoteJson',
+            method:'GET',
+            pagination:true,
+            rownumbers:true,
+            pageList: [2, 4, 6, 8],
+            pageSize:2,
+            striped:true, //斑马线
+            columns: [
+                [
+
+                    {field:'id',title:'id',hidden:true},
+                    {field:'queTitle',title:'报价书名称',align:'center',width:180},
+                    {field:'queDate',title:'报价提交时间',align:'center',width:250},
+                    {field:'enquireName',title:'对应询价书',align:'center',width:180,},
+                    {field:'endDate',title:'询价时间时间',align:'center',width:250},
+                    {field:'stockType',title:'采购类型',align:'center',width:250,
+                    formatter: function(value,row){
+                            if (row.stockType=='C000-1'){
+                                return '公开求购';
+                            }if (row.stockType=='C000-2'){
+                                return '定向询价';
+                            }else {
+                                return value;
+                            }
+                        }
+
+                    },
+
+                ]
+            ],
+            toolbar: [{
+                //打开报价信息
+                text: '打开',
+                iconCls: 'icon-search',
+                handler: function () {
+                     var rows = $('#dg').datagrid('getSelections');
+                     if(rows.length==0){
+                         $.messager.alert('提示','至少选择一项','error');
+                     }else{
+                         var qids = [];
+                         for(var i=0; i<rows.length; i++){
+                             qids.push(rows[i].id);
+                         }
+                         window.parent.main.location='/projectUpdate?qids='+qids;
+                     }
+                }
+            }, '-', {
+                text: '删除',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    var row = $('#dg').datagrid('getSelected');
+                    if(row){
+                        $.messager.confirm("消息？","你确定要删除吗？",function (check) {
+                            if(check){
+                                $.ajax({
+                                    url:'/delquote?qid='+row.id,
+                                    method:'POST',
+                                    dataType:'JSON',
+                                })
+                                $('#dg').datagrid('reload');	// 刷新数据表格
+                            }else{
+                                $.messager.show({
+                                    title:'消息',
+                                    msg:'取消删除',
+                                    showType:'fade',
+                                    style:{ right:'', bottom:''
+                                    }
+                                });
+                            }
+                        });
+                    }else{
+                        $.messager.alert('提示','至少选择一项','error');
+                    }
+
+                }
+            }]
+        });
+    })
+
+
+    //按条件查询
+    function doQuote() {
+        $("#dg").datagrid({
+            queryParams: {queTitle:$('#queTitle').val(),enquireName:$('#enquireName').val()}
+        });
+    }
+</script>
+</body>
+</html>

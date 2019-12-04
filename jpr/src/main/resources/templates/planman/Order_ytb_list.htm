@@ -1,0 +1,374 @@
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{debris/address::address('需求一览表')}"></head>
+    <META http-equiv=Content-Type content="text/html; charset=utf-8">
+    <LINK th:href="${'css/style.css'}" rel=stylesheet>
+    <SCRIPT language=JavaScript th:src="${'js/pub_Calendar.js'}"></SCRIPT>
+    <!--jquert-->
+    <script type="text/javascript" th:src="${'js/jquery.min.js/'}"></script>
+
+<script type="text/javascript">
+$(function (){
+	$("#datagrid").datagrid({
+		striped:true,
+		pagination:true,
+		columns:[
+			[    
+	        {field:'code',title:'代码',width:200,align:'center'},    
+	        {field:'name',title:'名称',width:200,align:'center'},    
+	        {field:'price',title:'价格',width:200,align:'center'}    
+	    ]
+			]  
+
+
+	});
+})
+</script>
+<body>
+  <table id="datagrid" style="withd:200px,height=500PX" >  </table>
+  
+
+  
+<CENTER>
+        
+                
+               
+                <input type=hidden value=3 name=p_listtype> <INPUT type=hidden value=1 name=page>
+                <p align=center>
+                    <input onClick="update_xuqiujihua();"type=button value=修改 id=‘xiugai’>
+                    <input onClick="delData();" type=button value=删除 id='shanchu'>
+                    <input onClick="javascript:ddtzDdmx()" type=button value=详情>
+                    <input onClick="quedingData()" type=button value=确定>
+                </p>
+        </form>
+</CENTER>
+</CENTER>
+        <script language=JavaScript>
+             $(function (){})
+            //修改验证
+            function update_xuqiujihua() {
+                var val=$("input:radio[name='rid']:checked").val(); //选中单选框的值
+                var objTable = document.getElementById("table1");
+                var oldTr = objTable.rows[val];
+                if (val == null) {
+                    alert("请先选择要修改的数据！");
+                }else if (oldTr.cells[6].innerText == "确定") {
+                    alert("选定的数据中有数已确定，不可以再修改。");
+                    //取消选中
+                    $("input:radio[name='rid']").attr("checked",false);
+                }else{
+                    updateMaterial(val);
+                }
+            }
+            //修改
+            function  updateMaterial(listindex) {
+                location.href="/findMaterial?listindex="+listindex;
+            }
+            //确定按钮 修改状态
+            function quedingData() {
+                var val=$("input:radio[name='rid']:checked").val(); //选中单选框的值
+                var objTable = document.getElementById("table1");
+                var oldTr = objTable.rows[val];
+                if (val == null) {
+                    alert("至少选择一条数据！");
+                }else if (oldTr.cells[6].innerText == "确定") {
+                    alert("选定的数据中有数已确定，请重新选择。");
+                    //取消选中
+                    $("input:radio[name='rid']").attr("checked",false);
+                }else{
+                    oldTr.cells[6].innerText = "确定";
+                    $("input:radio[name='rid']").attr("checked",false);
+                }
+
+                //异步发送请求向数据库插入一条数据
+            }
+
+            function chck()
+            {  var  count=0;
+                for (var i=0;i<form.length;i++)
+                    if ((form[i].type == "radio") && (form[i].checked))
+                        count++;
+                if (count==0)
+                { return false;  }
+                else
+                { return true;   }
+            }
+
+            function Add(SourceList,TargetList)
+            {
+                var nIndex = SourceList.selectedIndex;
+                var nCount = 0;
+                if (nIndex == -1)
+                {
+                    // Process continue only if at least one item selected
+                    //alert("请先选择一项!");
+                    return;
+                }
+                for (i=0;i<SourceList.length;i++)
+                {
+                    if (SourceList.options(i).selected==true)
+                    {
+                        if (inSouceList(SourceList.options(i).value,TargetList)==false)
+                        {
+                            var objSelected = new Option(SourceList[i].text, SourceList[i].value);
+                            TargetList.options[TargetList.length] = objSelected;
+                        }
+                    }
+                }
+                for (var i=0;i<TargetList.options.length;i++)
+                {
+                    TargetList.options(i).selected=true;
+                }
+                if(navigator.appName=="Netscape")
+                {
+                    history.go(0)
+                }
+            }
+            function inSouceList(SourceListOption,TargetList)
+            {
+                for (i=0;i<TargetList.length;i++)
+                {
+                    if (TargetList.options[i].value==SourceListOption)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            function Remove(SelectList)
+            {
+                var nIndex = SelectList.selectedIndex;
+                var nCount = 0;
+                if (nIndex == -1)
+                {
+                    // Process continue only if at least one item selected
+                    //alert("请先选择一项!");
+                    return;
+                }
+                while(nCount<SelectList.length)
+                {
+                    if (SelectList.options(nCount).selected==true)
+                    {
+                        SelectList.options[nCount] = null;
+                    }
+                    else
+                    {
+                        nCount++;
+                    }
+                }
+                if(navigator.appName=="Netscape")
+                {
+                    history.go(0)
+                }
+            }
+            function enter()
+            {
+                var srcEle = window.event.srcElement;
+                var tmp;
+                tmp = window.showModalDialog("pub_pub.Dialog_Date?vc_input=" + srcEle.value);
+                if ( tmp.indexOf("/") != -1)
+                {
+                    srcEle.value = tmp;
+                }
+                return;
+            }
+            function check_num()
+            {
+                if (window.event.keyCode > 57 || window.event.keyCode < 48)
+                {
+                    window.event.returnValue = false;
+                }
+            }
+            function check_blank()
+            {
+                if (window.event.keyCode < 48)
+                {
+                    window.event.returnValue = false;
+                }
+            }
+
+            function check_num_dot()
+            {
+                if (window.event.keyCode > 57 || window.event.keyCode < 46)
+                {
+                    window.event.returnValue = false;
+                }
+                else
+                {
+                    if(window.event.keyCode==47)
+                    {
+                        window.event.returnValue = false;
+                    }
+                    if(window.event.keyCode==46)
+                    {
+                        if (window.event.srcElement.value.indexOf(".")!=-1)
+                        {
+                            window.event.returnValue = false;
+                        }
+                    }
+                }
+            }
+
+            function submitonce(theform)
+            {
+                if (document.all || document.getElementById)
+                {
+                    for (i=0;i<theform.length;i++)
+                    {
+                        var tempobj = theform.elements[i]
+                        if (tempobj.type.toLowerCase() =="button")
+                            tempobj.disabled = true
+                    }
+                }
+            }
+
+            function CheckAll()
+            {
+                var i = 0;
+                for (i=0; i < window.document.forms[0].elements.length; i++)
+                {
+                    if(window.document.forms[0].elements[i].Chk<3)
+                    {
+                        if(window.document.forms[0].elements[i].value=="")
+                        {
+                            alert(window.document.forms[0].elements[i].alt);
+                            window.document.forms[0].elements[i].focus();
+                            return;
+                        }
+                        else if (window.document.forms[0].elements[i].Chk==2)
+                        {
+                            if (NotNumber(window.document.forms[0].elements[i].value))
+                            {
+                                alert("提示信息：\n不是有效的数字，请重新输入。");
+                                window.document.forms[0].elements[i].focus();
+                                return;
+                            }
+                        }
+                    }
+                    else if(window.document.forms[0].elements[i].Chk==3)
+                    {
+                        if(window.document.forms[0].elements[i].value!="")
+                        {
+                            if (NotNumber(window.document.forms[0].elements[i].value))
+                            {
+                                alert("提示信息：\n不是有效的数字，请重新输入。");
+                                window.document.forms[0].elements[i].focus();
+                                return;
+                            }
+                        }
+                    }
+                }
+                window.document.forms[0].submit();
+                return true;
+            }
+            function NotNumber(Field)
+            {
+                var j = 0;
+                var k = 0;
+                for (var i=0; i<Field.length; i++)
+                {
+                    var ch=Field.substring(i,i+1);
+                    if((ch>="0")&&(ch<="9"))
+                    {
+                        j=0;
+                    }
+                    else if(ch==".")
+                    {
+                        k++;
+                    }
+                    else
+                    {
+                        j=1;
+                        break;
+                    }
+                }
+                if ((j==0)&&(k<2))
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            function openwindown(page)
+            {
+                window.open(page,"newuser","toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=700,height=400,left=100,top=150");
+            }
+
+            function print_order_detail(){
+                window.open("print_order_detail.htm","Canny2","toolbar=0,location=0,status=0,menubar=0,scrollbars=0,width=600,height=440,left=100,top=60");
+            }
+
+
+            function submit_form(theForm, i) {
+
+                var count = 0;
+                for (var k = 0; k < theForm.length; k++)
+                    if ((theForm[k].type == "radio") && (theForm[k].checked))
+                        count++;
+                if (count == 0) {
+                    alert("提示信息：\n请选择需求计划。");
+                    return;
+                }
+                document.form.p_type.value = i;
+                window.document.form.submit();
+                return true;
+            }
+
+            function submit_form_cx() {
+                form.action = "Order_ytb_list.asp";
+                window.document.form.submit();
+            }
+
+            function workLog01() {
+                window.open("work_log01.htm", "Canny1", "toolbar=0,location=0,status=0,menubar=0,scrollbars=0,width=600,height=440,left=100,top=60");
+
+            }
+
+            function getLen() {
+                obj01 = document.getElementById("table1");
+                cGetRow = window.event.srcElement.parentElement.parentElement.rowIndex;
+            }
+
+
+            function delData() {
+                var obj = document.getElementById("p_orderno");
+                if (obj.checked) {
+                    obj01.deleteRow(cGetRow);
+                } else {
+                    alert("请选择要删除的数据！");
+                }
+            }
+
+            function opp(obj) {
+                //当点击确定后不可以再修改或删除
+                var c = document.getElementById("xiugai");
+                var d = document.getElementById("shanchu");
+                c.disabled = obj;
+                d.disabled = obj;
+
+            }
+
+            function ddtzDdmx() {
+                var obj = document.getElementsByName("checkbox");
+                var len = obj.length;
+                var count = 0;
+                for (var i = 0; i < len; i++) {
+                    if (obj[i].checked) {
+                        count++;
+                    }
+                }
+                if (count == 0) {
+                    alert("至少选择一条数据！");
+                } else if (count > 1) {
+                    alert("一次只能查看一条数据！");
+                } else {
+                    window.open("print_order_detail.htm", "Canny2", "toolbar=0,location=0,status=0,menubar=0,scrollbars=0,width=600,height=440,left=100,top=60");
+                }
+            }
+            
+        </script>
+    </body>
+</html>

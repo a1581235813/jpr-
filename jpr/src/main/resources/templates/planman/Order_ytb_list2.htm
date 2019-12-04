@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head th:replace="~{debris/address::address('需求计划查询')}"></head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+   #div1{
+    position: relative;
+     left: 230px;
+    
+   }
+  
+</style>
+<script type="text/javascript">
+$(function (){
+	$("#datagrid").datagrid({
+		url:"/Orderlist",
+		method:"get",
+		striped:true,
+		pagination:true,
+		rownumbers:true,
+		pageNumber:1,
+		pageList:[5,10,15,20],
+		pageSize:5,
+		fitColumns:true,
+		queryParams:{
+			  
+		},
+		columns:[
+			[    
+	        {field:'count',title:'选择',width:200,align:'left',checkbox:true},
+	        {field:'material_code',title:'物资代码',width:200,align:'left'},
+	        {field:'material_name',title:'物资名称',width:300,align:'left'},    
+	        {field:'amount',title:'数量',width:200,align:'left'},   
+	        {field:'status',title:'采购进度',width:200,align:'left',
+	        formatter:function (value,row,index){
+	        	if(value=="C001-10"){
+	        		 return "未确认";
+	        	}else{
+	        		return "确定";
+	        	}
+	        	
+	        } 	
+	        
+	        }
+	    ]
+			],
+		toolbar:[
+			{
+			iconCls: 'icon-search',
+			handler: function(){
+				 var rows = $('#datagrid').datagrid('getSelections');
+			     if(rows.length==0){
+			    	 alert('请选中一行');
+			     }else{
+			    	 if(rows.length>1){
+			    		 alert('只能选择一行');
+			    	 }else{
+			    		 
+			    		 window.open("/queryorders?id="+rows[0].id);
+			    	 }
+			     }
+			
+			},
+			},'-',
+			{
+				iconCls: 'icon-edit',
+				handler: function(){
+					 var rows = $('#datagrid').datagrid('getSelections');
+					 if(rows.length==0){
+						  alert("请选中一行");
+					 }else if(rows.length>1){
+						 alert("只能选择一行");
+					 }else{
+						 window.location="/Modifyrequirements?id="+rows[0].id;
+					 }
+					
+					
+					
+				}
+		     }
+			,'-',
+			{
+				iconCls: 'icon-cancel',
+				handler: function(){
+					 var rows = $('#datagrid').datagrid('getSelections');
+					 if(rows.length==0){
+							 alert("至少选中一条");
+						}else{
+							
+							$.messager.confirm('提示框','您确认想要删除需求记录吗？',function(r){    
+							    if (r){    
+							    	$.ajax({
+										url:"/deleteOrder",
+										type:"post",
+										data:{id:list},
+										 success:function (data) {
+							                   if(data=="success"){
+							                        alert("删除成功√");
+							                        $('#datagrid').datagrid('reload');  
+							                    }
+							                }
+										
+									});   
+							    }    
+							});  
+
+							
+						}
+						
+						
+					 
+					
+				}
+		     }
+			,'-',
+			{
+				iconCls: 'icon-ok',
+				handler: function(){
+					var rows = $('#datagrid').datagrid('getSelections');
+					if(rows.length==0){
+						alert("至少选中一条");
+					}else{
+						
+						var list=[];
+						 for(var i=0;i<rows.length;i++){
+							 
+							 list.push(rows[i].id);
+						 } 
+						
+						
+							 $.ajax({
+									url:"/Modifyrequirements",
+									type:"post",
+									data:{id:list},
+									 success:function (data) {
+						                   if(data=="success"){
+						                        alert("确认成功");
+						                        $('#datagrid').datagrid('reload');  
+						                    }
+						                }
+									
+								}); 
+								
+						
+						 
+						 
+					}
+				  
+					
+					 	
+				}
+		     }
+			] 
+
+
+	});
+	$("#btn1").click(function (){
+	  var name1=  $("#name1").val();
+	  var name2=  $("#name2").val();
+	  var cc=$("#cc").combo("getValue");
+		$("#datagrid").datagrid({
+			queryParams:{
+				name1:name1,
+				name2:name2,
+				state:cc
+				
+			}
+		});
+	});
+})
+</script>
+<body>
+   <h3 style="color:blue;text-align:center">需求计划一览表</h3>
+ <div id="div1"> <font size="2">物资编码:</font><input id="name1" class="easyui-textbox" data-options="iconCls:'icon-search'" style="width:180px;height:25px"> 
+ <font size="2">物资名称:</font><input  id="name2" class="easyui-textbox" data-options="iconCls:'icon-search'" style="width:180px;height:25px"> 
+<font size="2">状态:</font>  
+<select id="cc" class="easyui-combobox" name="dept" data-options="panelHeight:70" style="width:200px;height:25PX">   
+    <option value="C001-20">确认</option>   
+    <option value="C001-10">不确定</option>   
+</select>
+<a  id="btn1" class="easyui-linkbutton" data-options="iconCls:'icon-search',withd:30,height:25" style="withd:20px,height:500PX" >搜索</a>  
+ </div> 
+<table id="datagrid" >  </table>
+
+</body>
+</html>

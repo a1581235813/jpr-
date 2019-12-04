@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<HTML xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+
+	<TITLE>供应商密码修改</TITLE>
+<META http-equiv=Content-Language content=zh-cn>
+<META http-equiv=Content-Type content="text/html; charset=utf-8">
+<META content="MSHTML 6.00.2900.5626" name=GENERATOR>
+<LINK href="/css/style.css" rel=stylesheet>
+<script language=javascript> 
+function updaback()
+	{ 
+		 if (form.password.value!=form.repassword.value)
+			{  alert("登录密码和密码确认不一致！");   }
+		 else{
+             form.submit ();
+         }
+
+	 } 
+</script>
+</HEAD>
+<BODY>
+<center>
+<form name=form action="/sysUserUpdate" method="post">
+<input type=hidden name="id" th:value=${session.sysuser.id}>
+<TABLE style="LINE-HEIGHT: 30px" cellSpacing=1 cellPadding=0     width="100%"  bgColor=#336699 borderColorLight=#006699 border=0>
+<tr>
+<td>
+<table cellpadding="3" cellspacing="1" border="0" width="100%">
+<tr bgcolor="#ffffff"> 
+<td width="100%" colspan="20" bgcolor="#ffffff" align=center height=22><B><H2><font  color=#0070C0 >供应商密码修改</b>
+<a href="#"><img alt="帮助" src="/images/help_a.gif " border="0"></a>
+</td>
+</tr>
+
+<tr>
+		<TD  class=t1 noWrap width="20%" >登&nbsp;录&nbsp;名:</td>
+		<TD  class=t2 noWrap width="30%" colspan=3>[[${session.sysuser.loginId}]]<input type=hidden name="strMemLogName"></TD>
+</TR>
+<tr>
+		<TD class=t1 noWrap width="20%">登陆密码</td>
+		<TD class=t2 noWrap width="20%"><INPUT  name=password th:value=${session.sysuser.password} style="HEIGHT: 21px; WIDTH: 129px" size=16 maxlength=16 type="password" ></TD>
+		<TD class=t1 noWrap width="20%">确认密码</td>
+		<TD class=t2 noWrap width="30%"><INPUT  name=repassword th:value=${session.sysuser.password} style="HEIGHT: 21px; WIDTH: 129px" size=16 maxlength=16 type="password" ></TD>
+</TR>
+<tr>
+		<TD class=t1 nowrap width="20%">用户姓名</td>
+		<TD class=t2 noWrap width="30%">[[${session.employee.empName}]]</TD>
+		<TD class=t1 noWrap width="20%"> 性&nbsp;&nbsp;&nbsp;&nbsp;别</td>
+		<TD class=t2 noWrap width="30%">[[${session.employee.sex}]]</TD>
+</TR>
+<tr >
+		<TD class=t1 noWrap width="20%">联系电话</td>
+		<TD class=t2 noWrap width="30%">[[${session.employee.phone}]]</TD>
+		<TD class=t1 noWrap width="20%">传&nbsp;&nbsp;&nbsp;&nbsp;真</td>
+		<TD class=t2 noWrap width="30%">[[${session.employee.fax}]]</TD>
+</TR>
+<tr bgcolor="#99ccff">
+		<TD class=t1 noWrap width="20%">电子邮箱</td>
+		<TD class=t2 noWrap width="30%">[[${session.employee.email}]]</TD>
+		<TD class=t1 noWrap width="20%"> 邮&nbsp;&nbsp;&nbsp;&nbsp;编</td>
+		<TD class=t2 noWrap width="30%">[[${session.employee.zip}]]</TD></TR>
+<tr bgcolor="#99ccff">
+		<TD class=t1 noWrap width="10%">联系地址</td>
+		<TD class=t2 noWrap width="30%" colspan=3>[[${session.employee.address}]]</TD></TR>
+
+</table></td></tr></table>
+
+</P>
+<P align=center>
+		<INPUT id=button1 name=button1 type=button value="修改" onclick="updaback()">
+</P>
+</form></BODY></HTML>

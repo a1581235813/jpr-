@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{debris/address::address('报价维护')}"></head>
+<body>
+<h4 style="text-align: center;color:#0070c0;font-weight: bold">查看合同</h4>
+<!--按条件查询-->
+<div id="tb" style="padding: 3px;border-top: solid #99ccff 1px;text-align: center">
+  <form id="quote_form" method="post">
+    <spon>合同号:</spon> <input name="contName" id="contNum" >
+    <spon>签订时间:</spon>
+    从<input id="startDate" name="startDate" type="text" class="easyui-datebox"></input>
+    到<input id="endDate" name="endDate" type="text" class="easyui-datebox"></input>
+    <a href="#" class="btn btn-primary btn-sm"  onclick="doQuote()" >查询</a>
+    <a href="#" class="btn btn-primary btn-sm" onclick="$('#quote_form').form('clear')" dataoptions="iconCls:'icon-reload'">清空</a>
+  </form>
+</div>
+<!--产品数据表格-->
+<table id="dg"></table>
+<script type="text/javascript">
+    var url;
+    $(function () {
+        $('#dg').datagrid({
+            url:'/showContractJson',
+            method:'GET',
+            pagination:true,
+            rownumbers:true,
+            pageList: [2, 4, 6, 8],
+            pageSize:2,
+            striped:true, //斑马线
+            columns: [
+                [
+
+                    {field:'id',title:'id',hidden:true},
+                    {field:'contNum',title:'合同号',align:'center',width:250},
+                    {field:'contItem',title:'合同标的',align:'center',width:250},
+                    {field:'contPrice',title:'合同金额',align:'center',width:250},
+                    {field:'contDate',title:'签订时间',align:'center',width:245}
+                ]
+            ],
+
+        });
+    })
+    //按条件查询
+    function doQuote() {
+        $("#dg").datagrid({
+            queryParams: {
+                contNum:$('#contNum').val(),
+                startDate:$('#startDate').val(),
+                endDate:$('#endDate').val()
+            }
+        });
+    }
+</script>
+</body>
+</html>

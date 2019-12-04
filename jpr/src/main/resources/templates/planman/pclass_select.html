@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{debris/address::address('选择物资')}"></head>
+<style>
+.mydiv {
+	position: absolute;
+	top: 420px;
+	width: 1400px;
+}
+</style>
+<body>
+
+	<div style="text-align: center;">
+		<font color=red>选择物资</font>====&gt;录入需求计划====&gt;需求计划确认
+	</div>
+	<!--物质选择数据表格-->
+	<table id="dg2" style="height:250px">
+		<tbody id="tbody">
+
+		</tbody>
+
+	</table>
+	<div class="mydiv">
+		<table id="dg"></table>
+		<a id="btn" href="#" class="easyui-linkbutton"
+			data-options="iconCls:'icon-search'">添加</a>
+	</div>
+	<!--表格自适应宽度style="width:580px;"data-options="fitColumns:true"-->
+	<div align="center">
+		请先选择物资，然后点击：<A href="#" onclick="nextStep()"><FONT size=3><U>下一步</U>
+	</div>
+
+	<script>
+    
+        $(function () {
+        	$('#dg2').datagrid({
+        		pagination:true,
+        		
+        		 columns: [
+                     [
+                         {field:'checkbox',title:'选择',align:'center',width:200,checkbox:true},
+                         {field:'id',title:'序号',align:'center',width:200},
+                         {field:'materialNum',title:'产品编号',align:'center',width:300},
+                         {field:'materialName',title:'产品名称',align:'center',width:350},
+                     ]
+                 ],
+                 pageList: [5, 10, 15, 20],
+                 pageSize:5,
+                 striped:true
+                 
+                 
+       		  
+       	 })
+            $('#dg').datagrid({
+                url:'/findDSMJson',
+                method:'GET',
+                pagination:true,
+                pageList: [5, 10, 15, 20],
+                pageSize:5,
+                striped:true, //斑马线
+                columns: [
+                    [
+                        {field:'checkbox',title:'选择',align:'center',width:200,checkbox:true},
+                        {field:'id',title:'序号',align:'center',width:200},
+                        {field:'materialNum',title:'产品编号',align:'center',width:300},
+                        {field:'materialName',title:'产品名称',align:'center',width:350},
+                    ]
+                ]
+
+            });
+        	
+        })
+          
+        $("#btn").click(function (){
+        	 var rows = $('#dg').datagrid('getSelections');
+        	 if(rows.length==0){
+                 $.messager.alert('提示','至少选择一项','error');
+             }else{
+            	for(var i=0;i<rows.length;i++){
+            		
+            		$("#dg2").datagrid('appendRow',rows[i]);
+            	}
+            	
+            	$("#dg2").datagrid({
+            		toolbar:[{
+                 		iconCls: 'icon-cancel',
+                		handler: function(){
+                			var rows= $("#dg2").datagrid("getSelections");
+                			if(rows.length>0){
+                				for(var i=0; i<rows.length; i++){
+                					var data=rows[i];
+                					var index=$('#dg2').datagrid('getRowIndex',data);
+                					$('#dg2').datagrid('deleteRow',index);
+                                }
+                    			 
+                			}
+                			
+                		   
+                		}
+                	}]
+            		
+            	});
+            	
+            	 
+                 
+             }
+        	
+        })
+        function nextStep() {
+            var rows = $('#dg2').datagrid('getSelections');
+            if(rows.length==0){
+                $.messager.alert('提示','至少选择一项','error');
+            }else{
+                var mids = [];
+                 for(var i=0; i<rows.length; i++){
+                    mids.push(rows[i]);
+                }
+                
+                $.ajax({
+                    url:"/orderNewform",
+                    data:JSON.stringify(mids),
+                    type:"post",
+                    contentType:"application/json",
+                    success:function (res) {
+                    	
+                    	 window.parent.main.location="/Order";
+                    },
+                    error:function(msg){
+                    	
+                    }
+                });  
+            }
+        }
+    </script>
+
+</body>
+</html>

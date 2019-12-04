@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{debris/address::address('动态百叶窗')}"></head>
+<body>
+    <div id="myAccordion" class="easyui-accordion"   data-options="fit:'true'"></div>
+    <script>
+        $(function () {
+        	
+        	$("#myAccordion").tree({
+        		method:'GET',
+        		url:"/sysmenusjson",
+        		state:'closed',
+                   
+                    animate:true,
+                     onClick:function (node) {
+                    	if(node.linkUrl!=null){
+                    		 window.parent.main.location=node.linkUrl;
+                    		
+                    	}
+                    	
+                        // alert(node.text);
+                        //判断节点的属性或url为空，则不创建
+                      /*   if(node.attributes == null || node.attributes.url == null){
+                            return ;
+                        }else{
+                            //点击树新菜单在显示对应信息
+                            // alert(node.attributes.url)
+                            window.parent.main.location=node.attributes.url;
+                        } */
+                    }
+                   
+        	});
+        	
+           /*  $.ajax({
+                url:'/sysmenusjson',
+                type:'GET',
+                dataType:'JSON',
+                success:function (data) {
+                    console.log(data);
+                    //遍历数据集合
+                    $(data).each(function (index,menu) {
+                        //构建一级菜单
+                        if(menu.parentId == null){
+                            //动态创建百叶窗
+                            $('#myAccordion').accordion('add', {
+                                title: menu.text,
+                                id:'first'+menu.id
+                            });
+                            //根据动态生成的一级菜单id，动态添加ul，给ul取id
+                            $("#first"+menu.id).html('<ul id="myTree'+menu.id+'"></ul>  \n')
+                            //动态的给ul生成Tree
+                            $('#myTree'+menu.id).tree({
+                                data:menu.children,
+                                animate:true,
+                                onClick:function (node) {
+                                    // alert(node.text);
+                                    //判断节点的属性或url为空，则不创建
+                                    if(node.attributes == null || node.attributes.url == null){
+                                        return ;
+                                    }else{
+                                        //点击树新菜单在显示对应信息
+                                        // alert(node.attributes.url)
+                                        window.parent.main.location=node.attributes.url;
+                                    }
+                                }
+                            });
+                            $('#myTree'+menu.id).tree("collapseAll")
+                        }
+                    });
+                },
+                error:function () {
+                    alert("请求出错了.");
+                }
+            }) */
+        	
+        })
+    </script>
+</body>
+</html>

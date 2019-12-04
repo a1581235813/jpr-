@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<meta http-equiv="Content-Language" content="zh-cn">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<script type="text/javascript" th:src="${'js/jquery.min.js/'}"></script>
+<LINK th:href="${'css/style.css'}" rel=stylesheet>
+<SCRIPT language=JavaScript th:src="${'js/pub_Calendar.js'}"></SCRIPT>
+<title>录入采购需求</title>
+</head>
+<body>
+<div style="text-align: center;font-size: 14px">选择物资====><font color=red>录入需求计划</font>====>需求计划确认</div>
+<center>
+<form id="orders_form" action="Order_wtb_list.htm" method="post" enctype="multipart/form-data" >
+<div>
+        	<TABLE style="LINE-HEIGHT: 30px" cellSpacing=1 cellPadding=0     width="100%"  bgColor=#336699 borderColorLight=#006699 border=0>
+				<tr>
+                    <td>
+                        <table cellpadding="3" cellspacing="1" border="0" width="100%" id="table1">
+                            <center>
+                        <form name=form action="Order_wtb_do.asp" method="post">
+                            <tr  class="t1">
+                                <td nowrap align="center">选择</td>
+                                <td nowrap align="center">序号</td>
+                                <td nowrap align="center">产品编码</td>
+                                <td nowrap align="center">产品名称</td>
+                                <td nowrap align="center">计量单位</td>
+                                <td nowrap align="center">状态</td>
+                            </tr>
+                            <!--物资表格-->
+                            <tr class="t2" th:each="material,materialStat:${session.materials}">
+                                <td align=center><input type="radio" name="rid" th:value=${materialStat.count} onClick="changeData();"></td>
+                                <td align="center">[[${materialStat.count}]]</td>
+                                <td align="center" >[[${material.materialNum}]]<br></td>
+                                <td align="center" >[[${material.materialName}]]<br></td>
+                                <td align="center" >[[${material.materialUnit}]]<br></td>
+                                <td align="center">未完成<br></td>
+                            </tr>
+                            </form>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+        <TABLE style="LINE-HEIGHT: 30px" cellSpacing=1 cellPadding=0     width="80%"  bgColor=#336699 borderColorLight=#006699 border=0>
+    <tr>
+<td>
+<table cellpadding="3" cellspacing="1" border="0" width="100%" id="table2">
+
+    <tr class="t1">
+        <td>物资编码</td>
+
+        <td></td><input type="hidden" name="materialCode" id="materialCode">
+    </tr>
+
+    <tr class="t1">
+        <td >物资名称</td>
+        <td></td><input type="hidden" name="materialName" id="materialName">
+    </tr>
+   
+    <tr class="t1">
+        <td >数量</td>
+         <td><input type="text" name="amount" id="amount">
+         <font color=red>*</font>
+         </td>
+    </tr>
+
+    <tr class="t1">
+    <td >计量单位</td>
+      	   <td></td><input type="hidden" name="measureUnit" id="measureUnit">
+    </tr>
+
+    <tr class="t1">
+    <td >预单价(元)</td>
+       <td><input type="text" name="unitPrice" id="unitPrice"></td>
+    </tr>
+
+    <tr class="t1">
+    <td >交货期</td>
+      	<td>
+      	<input type="date" name="endDate" id="startDate">
+      	<font color=red>*</font>
+      	</td>
+    </tr>
+   
+    <tr class="t1">
+    <td >备注</td>
+      	<td>
+      	    <textarea name="remark" id="remark"></textarea>
+      	</td>
+    </tr>
+   
+ <tr class="t1">
+     <td colspan=2>
+     <font color=red><B>附件上传说明：文件大小不能超过4M。</B></font>
+     </td>
+ </tr>
+    </table>
+        </td>
+    </tr>
+ </table>
+<br>
+
+        <input type="button" value="重新选择物资" onClick="window.document.location='/pclass_select'">
+        <input type="button" value="保存" onClick="javascript:submit_form1();">
+        <input type="button" value="全部需求录入完毕" onClick="javascript:submit_form()">
+</center>
+        <input type="hidden" name="p_ordercode" value="1000201011133304">
+        <input type="hidden" name="p_orderno" value="1000201011133304">
+        <input type="hidden" name="p_type" value="">
+        <input type="hidden" name="p_ftype" value="2">
+    </form>
+        <script LANGUAGE="JAVASCRIPT">
+            function submit_form(){
+                    window.location="/Order_ytb_list";
+            }
+            //保存检查
+            function submit_form1(){
+                var rd = $("input:radio[name='rid']:checked").val(); //被选中单选框的值
+                var mount = document.getElementById("amount").value; //数量
+                var len = document.getElementById("unitPrice").value.length; //单价
+                var objTable = document.getElementById("table1"); //当前表格
+                var oldTr=objTable.rows[rd]; //对应的tr
+                //判断单选框是否选中
+                
+                if(rd==null){
+                    alert("请先选择要保存的物资");
+                    return false;
+                }else{
+                    //已完成的需求不可以重复录入
+                    if(oldTr.cells[5].innerText=="完成"){
+                        alert("请勿重复录入");
+                        //取消选中
+                        $("input:radio[name='rid']").attr("checked",false);
+                        return false;
+                    }else{
+                        if(mount<=0){
+                            alert("数量必须大于0");
+                            return false;
+                        } if(len==0){
+                            alert("单价不能为空");
+                            return false;
+                        }else{
+                            //未完成则改为完成
+                            oldTr.cells[5].innerText="完成";
+                            $("input:radio[name='rid']").attr("checked",false);
+                            //调用保存方法
+                            quedingData();
+                        }
+
+                    }
+                }
+
+
+
+            }
+            function quedingData(){
+                //异步录入需求计划
+                //表单序列化
+                var formdata = $('#orders_form').serialize();
+               
+                $.ajax({
+                    url:"/addOrder",
+                    type:"post",
+                    data: formdata,
+                    
+                    success:function (data) {
+                        if(data=="success"){
+                            alert("保存成功，请选择下一条要保存的数据！");
+                        }
+                    },
+                    error:function(){
+                        alert("保存出错了");
+                    }
+
+                })
+            }
+
+            function iszero(value,input)
+            {
+                if  (value==0)
+                {
+                    alert("交货期不能为空！");
+                    input.focus();
+                    return;
+                }
+            }
+
+            function changeData(){
+                var cGetRow=window.event.srcElement.parentElement.parentElement.rowIndex;
+                //得到某一行
+                var oldTr=table1.rows[cGetRow];
+                var num=oldTr.cells[2].innerText; //编号
+                var name=oldTr.cells[3].innerText; //名称
+                var unit=oldTr.cells[4].innerText; //单位
+                //获取数据现在在二表格
+                var oldTr2=table2.rows[2];
+                table2.rows[0].cells[1].innerText=num;
+                table2.rows[1].cells[1].innerText=name;
+                table2.rows[3].cells[1].innerText=unit;
+                //清空文本框
+                $("#amount").val("");
+                $("#unitPrice").val("");
+                $("#remark").val("");
+                //给隐藏的input赋值，（保存用）
+                $("#materialCode").val(num)
+                $("#materialName").val(name)
+                $("#measureUnit").val(unit)
+            }
+
+            var startDate = document.getElementById("startDate");
+            var date = new Date();
+            //日期单数-->在前面拼接0
+            var nowmonth = date.getMonth() + 1;
+            var nowdate = date.getDate();
+            if(nowmonth<10){
+                nowmonth = "0"+nowmonth;
+            }
+            if(nowdate<10){
+                nowdate = "0"+nowdate;
+            }
+            var dateString = date.getFullYear() + "-" + nowmonth + "-" + nowdate;
+            //alert(dateString)
+            startDate.value = dateString;
+        </script>
+    </body>
+</html>

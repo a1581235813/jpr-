@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{debris/address::address('采购计划审批一览表')}">
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<script type="text/javascript">
+$(function (){
+	
+	$("#datagrid").datagrid({
+		url:"/findallStock",
+		method:"get",
+		striped:true,
+		pagination:true,
+		rownumbers:true,
+		singleSelect:true,
+		pageNumber:1,
+		pageList:[5,10,15,20],
+		pageSize:5,
+		fitColumns:true,
+		columns:[
+			[    
+	        {field:'count',title:'选择',width:200,align:'left',checkbox:true},
+	        {field:'stock_name',title:'采购计划名称',width:200,align:'left'},
+	        {field:'stock_type',title:'合同进度',width:300,align:'left',
+	        	 formatter:function (value,row,index){
+	        		return "待审";
+	 	 	        
+	 	 	        	
+	 	 	        } 	
+	        },    
+	        {field:'status',title:'报价总金额',width:200,align:'left',
+	        	 formatter:function (value,row,index){
+	 	        	return "20000";
+	 	        	
+	 	        } 		
+	        }, 
+	        {field:'enquire_name',title:'询价书',width:200,align:'left'}
+	    ]
+			]
+		
+
+
+	});
+	
+	
+	 $("#btn3").click(function (){
+		 
+			var rows= $("#datagrid").datagrid("getSelected");
+			if(rows==null){
+				alert('请选择一项');
+			}else{
+				location.href="/Apply_caiwushenpi?id="+rows.id;
+			
+			}
+			
+		}); 
+		
+	
+})
+</script>
+<body>
+ 
+   <h3 style="color:blue;text-align:center">采购计划审批一览表</h3>
+
+
+
+<table id="datagrid" >  </table>
+<a  id="btn3" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'">审批</a> 
+</body>
+</html>

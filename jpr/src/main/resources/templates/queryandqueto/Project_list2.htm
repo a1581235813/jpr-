@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{debris/address::address('未编制询价书一览表')}">
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<style>
+   #div1{
+    position: relative;
+     left: 350px;
+    
+   }
+  
+</style>
+<script type="text/javascript">
+$(function (){
+	
+
+   $("#datagrid").datagrid({
+	url:"/Enquirefindall",
+	method:"post",
+	striped:true,
+	pagination:true,
+	rownumbers:true,
+	singleSelect:true,
+	pageNumber:1,
+	pageList:[5,10,15,20],
+	pageSize:5,
+	fitColumns:true,
+	queryParams:{
+		  
+	},
+	columns:[
+		[    
+        {field:'count',title:'选择',width:200,align:'left',checkbox:true},
+        {field:'stock_name',title:'采购计划名称',width:200,align:'left'},
+        {field:'stock_type',title:'采购类型',width:300,align:'left',
+        	 formatter:function (value,row,index){
+        		 if(value=="C000-1"){
+        			 return "公开求购";
+        		 }else{
+        			 return "定向询价";
+        		 }
+ 	 	        
+ 	 	        	
+ 	 	        } 	
+        },    
+        {field:'status',title:'采购进度',width:200,align:'left'}, 
+        {field:'submit_date',title:'采购计划下达时间',
+        	 formatter:function (value,row,index){
+ 	        return 	value.substr(0,10);
+ 	        	
+ 	        } 
+        },
+        {field:'end_date',title:'计划报价截至时间',width:200,align:'left',
+       	 formatter:function (value,row,index){
+       		 if(value!=null || value !=''){
+       			return 	"";
+       		 }else{
+       			 return " ";
+       		 }
+	        
+	        	
+	        } 	
+        }
+        
+    ]
+		]
+	
+
+
+});
+   
+   $("#btn1").click(function (){
+	  var name=  $("#name1").val();
+	  var type= $('#cc option:selected').val();
+	  $("#datagrid").datagrid({
+		  queryParams:{
+			   name:name,
+			   type:type
+			}
+		  
+	  });
+   });
+   $("#btn2").click(function (){
+	   var rows= $("#datagrid").datagrid("getSelected")
+	   if(rows==null){
+		   alert('至少选中一行');
+	   }else{
+		   location.href="/addenquire?id="+rows.id;
+	   }
+	  
+   });
+})
+</script>
+<body>
+<h3 style="color:blue;text-align:center">采购计划一览表</h3>
+<div id="div1"> 
+<font size="2">物资编码:</font><input id="name1" class="easyui-textbox" data-options="iconCls:'icon-search'" style="width:180px;height:25px"> 
+<font size="2">状态:</font>  
+<select id="cc" class="easyui-combobox" name="dept" data-options="panelHeight:70" style="width:200px;height:25PX">   
+    <option> 全部</option>
+    <option value="C000-1">公开求购</option>   
+    <option value="C000-2">定向询价</option>   
+</select>
+<a  id="btn1" class="easyui-linkbutton" data-options="iconCls:'icon-search',withd:30,height:25" style="withd:20px,height:500PX" >搜索</a>
+</div>
+     
+     <table id="datagrid" >  </table>
+  <a id="btn2"  class="easyui-linkbutton" data-options="iconCls:'icon-add'">编制</a>     
+</body>
+</html>

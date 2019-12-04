@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{debris/address::address('供应商产品信息')}"></head>
+<body>
+<h4 style="text-align: center;color:#0070c0;font-weight: bold">供应商产品信息</h4>
+<!--按条件查询-->
+<div id="tb" style="padding: 3px;border-top: solid #99ccff 1px;text-align: center">
+    <form id="material_form" method="post">
+        <spon>产品编号:</spon>
+            <input  id="Num" >
+        <spon>产品名称:</spon>
+            <input  id="Name" >
+        <a href="#" class="btn btn-primary btn-sm"  onclick="doMaterial()" >查询</a>
+        <a href="#" class="btn btn-primary btn-sm" onclick="$('#material_form').form('clear')" dataoptions="iconCls:'icon-reload'">清空</a>
+    </form>
+</div>
+<!--产品数据表格-->
+<table id="dg"></table>
+<div id="dlg" class="easyui-dialog" style="width:400px;height:400px;padding:10px 20px" closed="true" buttons="#dlg-buttons">
+    <!--供应商产品信息提交表单-->
+    <form id="material_fm" method="post">
+        <div class="form-group">
+            <input name="id" type="hidden">
+            产品编号：<input  name="materialNum" class="form-control"></br>
+            产品名称：<input  name="materialName" class="form-control"></br>
+            产品类别：<select name="materialType" class="form-control" id="material_type"></select>
+            产品数量：<input  name="materialCount" type="number" class="form-control"></br>
+            价格：<input  name="materialPrice" class="form-control"></br>
+            单位：<input  name="materialUnit"  class="form-control"></br>
+            规格型号：<input  name="specifications"  class="form-control"></br>
+            材料标准：<input  name="materialAtandard"  class="form-control"></br>
+            材料描述：<input  name="materialDescription"  class="form-control"></br>
+        </div>
+    </form>
+</div>
+<div id="dlg-buttons" style="text-align: center">
+    <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="savematerial()">保存</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">取消</a>
+</div>
+<script type="text/javascript">
+    var url;
+    //    下拉框产品类别
+    $(function () {
+        $.ajax({
+            url:"/showMaterialType",
+            type:"GET",
+            datetype:"json",
+            success:function (json) {
+                $("#material_type").get(0).options.length=0;
+                //获取下拉框的值
+                for (var i =0;i<json.length;i++){
+                    var option = new Option(json[i].typeName);
+                    option.value = json[i].typeNum;
+                    $("#material_type").get(0).options.add(option);
+                }
+            }
+
+        })
+    })
+
+    $(function () {
+        $('#dg').datagrid({
+            url:'/showMaterialJson',
+            method:'GET',
+            pagination:true,
+            rownumbers:true,
+            pageList: [2, 4, 6, 8],
+            pageSize:2,
+            striped:true, //斑马线
+            //样式
+            // rowStyler: function(index,row){
+            //         return 'background-color:#6293BB;color:#fff;';
+            // },
+            columns: [
+                [
+
+                {field:'id',title:'id',hidden:true},
+                {field:'materialNum',title:'产品编号',align:'center',width:180},
+                {field:'materialName',title:'产品名称',align:'center',width:260},
+                {field:'materialType',title:'产品类别',align:'center',width:160,
+                    formatter: function(value,row){
+                        if (row.materialType=='W000-W40'){
+                            return '金属模电阻';
+                        }if (row.materialType=='W000-W41'){
+                            return '线绕电阻';
+                        }if (row.materialType=='W000-W60'){
+                            return '二级管';
+                        }if (row.materialType=='W000-W61'){
+                            return '发光器件';
+                        }if (row.materialType=='W000-W62'){
+                            return '三级管';
+                        }if (row.materialType=='W000-W64'){
+                            return '晶振';
+                        } else {
+                            return value;
+                        }
+                    }
+
+                },
+                {field:'specifications',title:'规格型号',align:'center',width:110},
+                {field:'materialCount',title:'数量',align:'center',width:110},
+                {field:'materialPrice',title:'价格',align:'center',width:120},
+                {field:'materialUnit',title:'单位',align:'center',width:110},
+                {field:'materialDescription',title:'材料描述',align:'center',width:200},
+
+                ]
+            ],
+            //工具栏
+            toolbar: [{
+                text: '新增产品',
+                iconCls: 'icon-add',
+                handler: function () {
+                    $('#dlg').dialog({
+                        closable:false,
+                        height:'500px',
+                        title:'新增产品',
+                    }),
+                        $('#dlg').dialog('open');
+                    $('#emp_fm').form('clear');
+                    url = '/saveMaterial?sign='+1; //标记1增加
+                }
+            }, '-', {
+                text: '修改产品',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    var row = $('#dg').datagrid('getSelected');
+                    if (row){
+                        $('#dlg').dialog('open').dialog('setTitle','修改产品信息');
+                        //往表单中加载选中的行对象
+                        $('#material_fm').form('load',row);
+                        url = '/saveMaterial?sign='+2; //标记2修改
+                    }else{
+                        $.messager.alert('提示','请选择需要修改的产品','error');
+                    }
+                }
+            }, '-', {
+                text: '删除产品',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    var row = $('#dg').datagrid('getSelected');
+                    if(row){
+                        $.messager.confirm("消息？","你确定要删除吗？",function (check) {
+                            if(check){
+                                $.ajax({
+                                    url:'/delmaterial?mid='+row.id,
+                                    method:'POST',
+                                    dataType:'JSON',
+                                })
+                                $('#dg').datagrid('reload');	// 刷新数据表格
+                            }else{
+                                $.messager.show({
+                                    title:'消息',
+                                    msg:'取消删除',
+                                    showType:'fade',
+                                    style:{ right:'', bottom:''
+                                    }
+                                });
+                            }
+                        });
+                    }else{
+                        $.messager.alert('提示','至少选择一项','error');
+                    }
+
+                }
+            }]
+        });
+    })
+
+//   提交 -->添加和修改
+function savematerial(){
+    $('#material_fm').form('submit',{
+        url: url,
+        onSubmit: function(){
+            return $(this).form('validate');
+        },
+        success: function(result){
+            if (result=='success'){
+                //保存成功，提示信息
+                $.messager.progress({
+                    title:'系统消息',
+                    msg:'正在保存...',
+                    interval:100
+                });
+                setTimeout(function(){
+                    $.messager.progress('close');
+                },1000)
+                $('#dlg').dialog('close');		// 关闭弹出框
+                $('#dg').datagrid('reload');	// 刷新数据表格
+            } else {
+                $.messager.show({
+                    title:'系统消息',
+                    msg:'保存失败.',
+                    timeout:3000,
+                    showType:'slide'
+                });
+            }
+        }
+    });
+}
+//按条件查询
+    function doMaterial() {
+        $("#dg").datagrid({
+            queryParams: {materialNum:$('#Num').val(),materialName:$('#Name').val()}
+        });
+    }
+</script>
+</body>
+</html>

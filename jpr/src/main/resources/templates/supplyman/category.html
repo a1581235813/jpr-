@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{debris/address::address('供应商材料类型')}"></head>
+<body>
+<h4 style="text-align: center;color:#0070c0;font-weight: bold">供应商材料类型维护</h4>
+<!--按条件查询-->
+<div id="tb" style="padding: 3px;border-top: solid #99ccff 1px;text-align: center">
+    <form id="materialType_form" method="post">
+        <spon>类型编号:</spon>
+        <input  id="typeNum" >
+        <spon>类型名称:</spon>
+        <input  id="typeName" >
+        <a href="#" class="btn btn-primary btn-sm"  onclick="doMaterialType()" >查询</a>
+        <a href="#" class="btn btn-primary btn-sm" onclick="$('#materialType_form').form('clear')" dataoptions="iconCls:'icon-reload'">清空</a>
+    </form>
+</div>
+<!--材料类型数据表格-->
+<table id="dg"></table>
+<div id="dlg" class="easyui-dialog" style="width:300px;height:350px;padding:10px 20px" closed="true"  buttons="#dlg-buttons">
+    <!--材料类型提交表单-->
+    <form id="materialtype_fm" method="post">
+        <div class="form-group">
+            <input name="id" type="hidden">
+            类型编号：<input  name="typeNum" class="form-control"></br>
+            类型名称：<input  name="typeName" class="form-control"></br>
+            材料描述：<input  name="typeUnit"  class="form-control"></br>
+        </div>
+    </form>
+</div>
+<div id="dlg-buttons" style="text-align: center">
+    <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="savematerialtype()">保存</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">取消</a>
+</div>
+<script type="text/javascript">
+    var url;
+    $(function () {
+        $('#dg').datagrid({
+            url:'/showMaterialTypeJson',
+            method:'GET',
+            pagination:true,
+            rownumbers:true,
+            pageList: [2, 4, 6, 8],
+            pageSize:2,
+            striped:true, //斑马线
+            columns: [
+                [
+                    {field:'id',title:'id',hidden:true},
+                    {field:'typeNum',title:'类型编号',align:'center',width:200},
+                    {field:'typeName',title:'类型名称',align:'center',width:200},
+                    {field:'typeUnit',title:'类型描述',align:'center',width:300},
+
+                ]
+            ],
+            //工具栏
+            toolbar: [{
+                text: '新增类型',
+                iconCls: 'icon-add',
+                handler: function () {
+                    $('#dlg').dialog({
+                        closable:false,
+                        height:'500px',
+                        title:'新增类型',
+                    }),
+                        $('#dlg').dialog('open');
+                    $('#emp_fm').form('clear');
+                    url = '/saveMaterialType?sign='+1; //标记1增加
+                }
+            }, '-', {
+                text: '修改类型',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    var row = $('#dg').datagrid('getSelected');
+                    if (row){
+                        $('#dlg').dialog('open').dialog('setTitle','修改类型信息');
+                        //往表单中加载选中的行对象
+                        $('#materialtype_fm').form('load',row);
+                        url = '/saveMaterialType?sign='+2; //标记2修改
+                    }else{
+                        $.messager.alert('提示','请选择需要修改的类型','error');
+                    }
+                }
+            }, '-', {
+                text: '删除类型',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    var row = $('#dg').datagrid('getSelected');
+                    if(row){
+                        $.messager.confirm("消息？","你确定要删除吗？",function (check) {
+                            if(check){
+                                $.ajax({
+                                    url:'/delMaterialType?tid='+row.id,
+                                    method:'POST',
+                                    dataType:'JSON',
+                                })
+                                $('#dg').datagrid('reload');	// 刷新数据表格
+                            }else{
+                                $.messager.show({
+                                    title:'消息',
+                                    msg:'取消删除',
+                                    showType:'fade',
+                                    style:{ right:'', bottom:''
+                                    }
+                                });
+                            }
+                        });
+                    }else{
+                        $.messager.alert('提示','至少选择一项','error');
+                    }
+
+                }
+            }]
+        });
+    })
+
+    //   提交 -->添加和修改
+    function savematerialtype(){
+        $('#materialtype_fm').form('submit',{
+            url: url,
+            onSubmit: function(){
+                return $(this).form('validate');
+            },
+            success: function(result){
+                if (result=='success'){
+                    //保存成功，提示信息
+                    $.messager.progress({
+                        title:'系统消息',
+                        msg:'正在保存...',
+                        interval:100
+                    });
+                    setTimeout(function(){
+                        $.messager.progress('close');
+                    },1000)
+                    $('#dlg').dialog('close');		// 关闭弹出框
+                    $('#dg').datagrid('reload');	// 刷新数据表格
+                } else {
+                    $.messager.show({
+                        title:'系统消息',
+                        msg:'保存失败.',
+                        timeout:3000,
+                        showType:'slide'
+                    });
+                }
+            }
+        });
+    }
+    //按条件查询
+    function doMaterialType() {
+        $("#dg").datagrid({
+            queryParams: {typeNum:$('#typeNum').val(),typeName:$('#typeName').val()}
+        });
+    }
+</script>
+</body>
+</html>
