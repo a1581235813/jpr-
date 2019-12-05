@@ -27,6 +27,7 @@ public class TreeUtil {
 				return list2;
             	 
              }
+	//这是数的插件
              public static List<SysMenus> findSons (Long id,List<SysMenus> list){
             	 List<SysMenus> list2=new ArrayList<SysMenus>();
             	 for (SysMenus menus : list) {
